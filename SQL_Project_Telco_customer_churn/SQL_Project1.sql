@@ -1,4 +1,4 @@
-﻿--Content of the datasets
+--Content of the datasets
 --Each row represents a customer, each column contains customer’s attributes described on the column Metadata.
 
 --The data set includes information about:
@@ -8,12 +8,6 @@
 --Demographic info about customers – gender, age range, and if they have partners and dependents
 
 --I will explore the data and try to answer some questions like:
---What's the % of Churn Customers and customers that keep in with the active services?
---The gender ratio among Churn customers
---Which service do churned customers prefer the most?
----What's the most profitable service types?
---Which features and services are most profitable?
-
 
 select * from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 
@@ -42,7 +36,26 @@ FROM [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 where churn = 'yes'
 group by gender
 
---3. Which service do churned customers prefer the most?
+--3.Partner ratio --
+select churn, Partner, concat(count(Partner)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'no'),'%') as use_by_churn
+from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
+where churn = 'no'
+group by  churn, Partner
+union all
+select churn, Partner, concat(count(Partner)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
+from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
+where churn = 'yes'
+group by  churn, Partner
+--The majority of churn customer don’t have a partner.
+--Among those who didn't churn, there are more people with a partner.
+
+--4. Number of customer who is Churn 
+select SeniorCitizen, count(SeniorCitizen) as cus_num 
+from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
+where churn = 'yes'
+Group by SeniorCitizen
+
+--5. Which service do churned customers prefer the most?
 with service_use as (
 	select 'PhoneService' as cus_Service, count(PhoneService) as cus_num
 	from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
@@ -87,15 +100,9 @@ select  max(cus_num) as max_service
 from service_use
 select  min(cus_num) as min_service
 from service_use
---- có thể thấy những khách hàng đã rời bỏ sửu dụng dịch vụ techsupport nhiều nhất---
+--- Identify the customers who have churned and used techsupport the most---
 
---4. 
-select SeniorCitizen, count(SeniorCitizen)
-from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
-where churn = 'yes'
-Group by SeniorCitizen
-
---5. PaymentMethod
+--6. PaymentMethod
 select PaymentMethod, concat(count(PaymentMethod)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
 from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 where churn = 'yes'
@@ -106,51 +113,36 @@ from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 where churn = 'no'
 Group by PaymentMethod
 
-----da so churn customer thich dung Electronic check hon
+----The majority of churned customers prefer using Electronic check--
 
---contract
-select Contract, concat(count(Contract)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
+--7. The types of contracts that customers sign (both churn and non-churn)
+select churn, Contract, concat(count(Contract)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
 from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 where churn = 'yes'
-Group by Contract
+Group by Contract, churn
 
-select Contract, concat(count(Contract)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'no'),'%') as use_by_churn
+select churn, Contract, concat(count(Contract)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'no'),'%') as use_by_churn
 from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 where churn = 'no'
-Group by Contract
+Group by Contract, churn
 
------ đa số chỉ ký hợp đồng ngắn hạn --
+----- The majority of churned customers sign the shortest-term contracts: one-month contracts.--
 
----MonthlyCharges--
+---8. MonthlyCharges--
 select churn, avg(cast(MonthlyCharges as float)) as avg_MonthlyCharges
 from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
 group by churn
---churn customer phải trả nhiều tiền hàng tháng hơn
+--Churned customers have to pay more money monthly--
 
---Partner--
-select churn, Partner, concat(count(Partner)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'no'),'%') as use_by_churn
-from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
-where churn = 'no'
-group by  churn, Partner
-union all
-select churn, Partner, concat(count(Partner)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
-from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
-where churn = 'yes'
-group by  churn, Partner
 
------ nhóm người churn thì đa số không có partner
------nhóm người no churn thì số người có partner nhiều hơn
 
---Dependents--
-select churn, Dependents, concat(count(Dependents)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'no'),'%') as use_by_churn
-from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
-where churn = 'no'
-group by  churn, Dependents
-union all
-select churn, Dependents, concat(count(Dependents)*100/(select count(*) from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn] where churn = 'yes'),'%') as use_by_churn
-from [dbo].[WA_Fn-UseC_-Telco-Customer-Churn]
-where churn = 'yes'
-group by  churn, Dependents
+
+
+
+
+
+
+
 
 
 
