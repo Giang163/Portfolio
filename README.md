@@ -7,6 +7,17 @@ My CV in: [pdf](https://github.com/Giang163/Portfolio/blob/main/CV%20NGUYEN%20HU
 
 ## Portfolio Projects
 In this section I will list data analytics projects briefly describing the technology stack used to solve cases.
+### Rental Trends Analysis
+**Code:** [`Rental Trends Analysis.sql`](https://github.com/Giang163/Portfolio/blob/main/Rental%20Trends%20Analysis/rental%20trend%20analysis.sql).
+
+**Goal:** Assess and optimize the business performance of rental units by understanding the factors influencing revenue and occupancy rates.
+
+**Description:** This file contains listing-level information from 2020-2022, aggregated on a monthly basis. It encompasses various metrics, such as unique property codes (unified_id), generated revenue, availability (openness), occupancy ratios, nightly rates, lead times, and average length of stay for reservations made each month. Additionally, it provides insights into property amenities.
+
+**Skills:**  data analysis.
+
+**Technology:** SQL server
+
 ### Analyzing Customer Transactions for Insights
 **Code:** [`Project customer order.sql`](https://github.com/Giang163/Portfolio/blob/main/SQL_Project_Customer_orders/Customer%20order.sql).
 
